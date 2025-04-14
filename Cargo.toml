@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["rust-bytes"]
+members = ["deref-macro", "rust-bytes"]
 
 [profile.dev.package.backtrace]
 opt-level = 3
