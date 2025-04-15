@@ -1,8 +1,8 @@
-use brands::UserId;
 use color_eyre::eyre::Result;
 use std::collections::HashSet;
 use ulid::Ulid;
 
+mod bitflags;
 mod brands;
 mod errors;
 mod macros;
@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
   // branded types
   utils::section("Branded types");
   let api_user_id = Ulid::new();
-  let user_id = UserId(api_user_id.into());
+  let user_id = brands::UserId(api_user_id.into());
 
   // deref ensures we can directly access the type
   println!("User id is: {}", *user_id);
@@ -49,6 +49,33 @@ async fn main() -> Result<()> {
   utils::section("Assertion-type error handling");
   let result = errors::divide_assert(10, 2)?;
   println!("Quotient: {}", result);
+
+  // bitflags
+  utils::section("Bitflags");
+  let mut file_access = bitflags::FileAccess::new(bitflags::Permission::Read.into());
+  println!(
+    "Has read access: {}",
+    file_access.has(bitflags::Permission::Read)
+  );
+
+  file_access.set(bitflags::Permission::Write);
+  println!(
+    "Has write access: {} and read access: {}",
+    file_access.has(bitflags::Permission::Write),
+    file_access.has(bitflags::Permission::Read)
+  );
+
+  file_access.toggle(bitflags::Permission::Read);
+  println!(
+    "Read access present: {}",
+    file_access.has(bitflags::Permission::Read)
+  );
+
+  file_access.clear(bitflags::Permission::Write);
+  println!(
+    "Write access present: {}",
+    file_access.has(bitflags::Permission::Write)
+  );
 
   Ok(())
 }

@@ -14,6 +14,7 @@ use syn::{Data, DeriveInput, Fields, parse_macro_input};
 ///
 /// ```rust
 /// use std::ops::Deref;
+/// use deref_macro::DerefImpl;
 ///
 /// #[derive(DerefImpl)]
 /// struct Wrapper(String);
@@ -85,13 +86,15 @@ pub fn derive_deref(input: TokenStream) -> TokenStream {
 ///
 /// ```rust
 /// use std::ops::DerefMut;
+/// use deref_macro::DerefImpl;
+/// use deref_macro::DerefMutImpl;
 ///
-/// #[derive(DerefMutImpl)]
+/// #[derive(DerefImpl, DerefMutImpl)]
 /// struct Wrapper(String);
 ///
 /// fn main() {
 ///     let mut wrapper = Wrapper(String::from("Hello, world!"));
-///     wrapper = "Hello Rust!".to_string();
+///     wrapper = Wrapper("Hello Rust!".to_string());
 ///     assert_eq!(*wrapper, "Hello Rust!");
 /// }
 /// ```
