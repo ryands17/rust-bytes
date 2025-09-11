@@ -8,6 +8,7 @@ mod errors;
 mod macros;
 mod multithreading;
 mod options;
+mod typestate;
 mod utils;
 
 #[tokio::main]
@@ -76,6 +77,48 @@ async fn main() -> Result<()> {
     "Write access present: {}",
     file_access.has(bitflags::Permission::Write)
   );
+
+  // Create a new locked password manager
+  utils::section("Typestate pattern");
+
+  let pm = typestate::PasswordManager::new();
+  match pm.unlock("wrong_password") {
+    Ok(_) => unreachable!(),
+    Err(e) => println!("Failed to unlock as expected: {}", e),
+  }
+
+  // Create another one and unlock it properly
+  let pm = typestate::PasswordManager::new();
+  let mut pm = pm.unlock("correct_master_password").unwrap();
+
+  // Now we can use the unlocked methods
+  pm.set_password("gmail".to_string(), "super_secure_123".to_string());
+  pm.set_password("github".to_string(), "another_password".to_string());
+
+  // Get passwords
+  if let Some(password) = pm.get_password("gmail") {
+    println!("Gmail password: {}", password);
+  }
+
+  // List all services
+  println!("Stored services: {:?}", pm.list_services());
+
+  // Lock it again
+  let pm = pm.lock();
+
+  // These would be compile errors if uncommented:
+  // pm.set_password("test".to_string(), "password".to_string()); // Error!
+  // pm.get_password("gmail"); // Error!
+
+  let mut pm = pm.unlock("correct_master_password").unwrap();
+
+  // remove a password
+  pm.remove_password("github");
+
+  // And the data persists
+  if let Some(password) = pm.get_password("gmail") {
+    println!("Gmail password after unlock: {}", password);
+  }
 
   Ok(())
 }
