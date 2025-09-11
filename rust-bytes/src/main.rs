@@ -120,5 +120,15 @@ async fn main() -> Result<()> {
     println!("Gmail password after unlock: {}", password);
   }
 
+  utils::section("Filter map to remove None values");
+  let nums = vec!["10", "20", "abc", "30", "def", "40"];
+  let nums_safe = utils::parse_numbers(&nums);
+  dbg!(nums_safe);
+
+  match utils::parse_numbers_fail_fast(&nums) {
+    Ok(nums) => println!("Parsed numbers: {:?}", nums),
+    Err(e) => println!("Failed to parse numbers: {}", e),
+  }
+
   Ok(())
 }
