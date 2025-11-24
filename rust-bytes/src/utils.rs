@@ -16,7 +16,7 @@ pub(crate) fn parse_numbers(input: &[&str]) -> Vec<i32> {
 // input type can also be Vec<Result<&str, _>>
 pub(crate) fn parse_numbers_fail_fast(strings: &[&str]) -> Result<Vec<i32>> {
   strings
-    .into_iter()
+    .iter()
     .map(|s| s.parse::<i32>().map_err(Into::into))
     .collect()
 }
